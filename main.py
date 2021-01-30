@@ -1,37 +1,48 @@
+import tkinter.filedialog as fd
+from tkinter import *
+from GoogleAudioManager import GoogleAudioManager
+import textract
+from playsound import playsound
+import os.path
 import os
-from google.cloud import texttospeech
 
-"""Synthesizes speech from the input string of text or ssml.
 
-Note: ssml must be well-formed according to:
-    https://www.w3.org/TR/speech-synthesis/
-"""
+audio_file_path = ""
+pdf_name = ""
 
-# Instantiates a client
-client = texttospeech.TextToSpeechClient()
 
-# Set the text input to be synthesized
-synthesis_input = texttospeech.SynthesisInput(text="This will be the text that will be spoken.")
+def find_document():
+    global pdf_name
+    global audio_file_path
+    file_path = fd.askopenfilename(title="Select a PDF", filetypes=[("PDF files", "*.pdf")])
+    if file_path:
+        pdf_name = file_path.split('/')[-1]
+        audio_file_path = f"audio-files/{pdf_name}".replace('.pdf', '.mp3')
+        speak(file_path)
 
-# Build the voice request, select the language code ("en-US") and the ssml
-# voice gender ("neutral")
-voice = texttospeech.VoiceSelectionParams(
-    language_code="en-GB", ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL
-)
 
-# Select the type of audio file you want returned
-audio_config = texttospeech.AudioConfig(
-    audio_encoding=texttospeech.AudioEncoding.MP3
-)
+def speak(file):
+    text_to_read = textract.process(file, encoding='ascii').decode('utf-8')
 
-# Perform the text-to-speech request on the text input with the selected
-# voice parameters and audio file type
-response = client.synthesize_speech(
-    input=synthesis_input, voice=voice, audio_config=audio_config
-)
+    speech_manager = GoogleAudioManager()
+    speech_manager.text_to_speech(text_to_read, outfile=audio_file_path)
+    if os.path.isfile(audio_file_path):
+        playsound(audio_file_path)
 
-# The response's audio_content is binary.
-with open("output.mp3", "wb") as out:
-    # Write the response to the output file.
-    out.write(response.audio_content)
-    print('Audio content written to file "output.mp3"')
+
+# ------- UI set up ------------ #
+window = Tk()
+window.title("Speaky")
+window.config(padx=50, pady=50)
+window.resizable(width=True, height=True)
+window.geometry("250x250")
+
+feedback_label = Label(text="Search for file to read.")
+feedback_label.grid(row=0, column=0)
+feedback_label.config(padx=10, pady=10)
+
+open_file_button = Button(window, text='Search', command=find_document)
+open_file_button.grid(row=1, column=0)
+open_file_button.config(padx=5, pady=5)
+
+window.mainloop()

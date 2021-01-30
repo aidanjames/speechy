@@ -1,2 +1,6 @@
 # Project exclude paths
 /venv/
+/audio-files/
+/credentials/
+/pdf-files/
+/que.py
