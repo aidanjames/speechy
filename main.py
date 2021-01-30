@@ -11,7 +11,7 @@ Note: ssml must be well-formed according to:
 client = texttospeech.TextToSpeechClient()
 
 # Set the text input to be synthesized
-synthesis_input = texttospeech.SynthesisInput(text="Hello, World! What are you doing today? Would you like a biscuit? Cunt!")
+synthesis_input = texttospeech.SynthesisInput(text="This will be the text that will be spoken.")
 
 # Build the voice request, select the language code ("en-US") and the ssml
 # voice gender ("neutral")
