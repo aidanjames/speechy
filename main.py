@@ -4,7 +4,6 @@ from GoogleAudioManager import GoogleAudioManager
 import textract
 from playsound import playsound
 import os.path
-import os
 
 
 audio_file_path = ""
@@ -26,6 +25,7 @@ def speak(file):
 
     speech_manager = GoogleAudioManager()
     speech_manager.text_to_speech(text_to_read, outfile=audio_file_path)
+
     if os.path.isfile(audio_file_path):
         playsound(audio_file_path)
 
